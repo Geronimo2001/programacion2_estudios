@@ -6,25 +6,15 @@ using namespace std;
 
 class ManejadorArchivosTexto {
 private:
-    int espacios;
-    int ocupados;
-    int libres;
-    float recaudados;
-    float porcentaje;
+    int contenido;
+
 public:
-    ManejadorArchivosTexto(int esp, int lib, int ocu, float rec, float porc);
+
+    ManejadorArchivosTexto(int cont);
     void leerArchivo(string nombreArchivo);
-    void escribirArchivo(string nombreArchivo, int esp, int lib, int ocu, float rec, float porc);
+    void escribirArchivo(int contenido);
+
 };
-
-ManejadorArchivosTexto::ManejadorArchivosTexto(int esp, int lib, int ocu, float rec, float porc) {
-    this->espacios = esp;
-    this->libres = lib;
-    this->ocupados = ocu;
-    this->recaudados = rec;
-    this->porcentaje = porc;
-}
-
 void ManejadorArchivosTexto::leerArchivo(string nombreArchivo) {
     ifstream archivo(nombreArchivo);
     if (archivo.is_open()) {
@@ -39,87 +29,159 @@ void ManejadorArchivosTexto::leerArchivo(string nombreArchivo) {
 }
 
 
-void ManejadorArchivosTexto::escribirArchivo(string nombreArchivo, int esp, int lib, int ocu, float rec, float porc) {
-    ofstream archivo(nombreArchivo);
+void ManejadorArchivosTexto::escribirArchivo(int cont) {
+    ofstream archivo("C:\\Users\\geronimo\\OneDrive\\Escritorio\\Programacion 2\\trabajos-practicos-a1-v1-Geronimo2001\\u4\\ej01\\registro.txt",std::ios::app);
     if (archivo.is_open()) {
-        archivo << esp << endl;
-        archivo << lib << endl;
-        archivo << ocu << endl;
-        archivo << rec << endl;
-        archivo << porc << endl;
 
+        archivo<<"Recaudado:";
+        archivo << cont<<" $\n";
         archivo.close();
-        cout << "Archivo guardado exitosamente." << endl;
+        cout << "Archivo guardado exitosamente." <<endl;
     } else {
         cout << "No se pudo abrir el archivo." << endl;
     }
 }
 
+ManejadorArchivosTexto::ManejadorArchivosTexto(int cont) {
+    this->contenido=cont;
+}
+
+// Resto del código de la clase ManejadorArchivosTexto...
+
 class Estacionamiento {
 private:
-    ManejadorArchivosTexto registro;
+
+    int recaudado;
     int espacios;
-    int ocupados;
-    int libres;
-    float recaudados;
+    int egresos;
+    int ingresos;
     float porcentaje;
+    ManejadorArchivosTexto registro;
+
 public:
-    Estacionamiento(ManejadorArchivosTexto reg, int esp, int ocu, int lib, float rec, float porc);
-    void mostrarRegistro();
-    void ingresarespacios(ManejadorArchivosTexto reg, int esp);
+    Estacionamiento(int rec, int esp, int ocu, int lib, float porc,ManejadorArchivosTexto registro);
+    void inicializarEspacios();
+    void inicializarlibres();
+    void espaciosocupados();
+    void salidaDeAutos();
 };
-
-Estacionamiento::Estacionamiento(ManejadorArchivosTexto reg, int esp, int ocu, int lib, float rec, float porc)
-        : registro(reg), espacios(esp), ocupados(ocu), libres(lib), recaudados(rec), porcentaje(porc) {
-    // Aquí se realiza la inicialización de los miembros con los valores pasados como argumentos.
+Estacionamiento::Estacionamiento(int rec, int esp, int ocu, int lib, float porc, ManejadorArchivosTexto registro) : registro(rec) {
+    this->recaudado = rec;
+    this->espacios = esp;
+    this->egresos = ocu;
+    this->ingresos = lib;
+    this->porcentaje = porc;
 }
 
-void Estacionamiento::mostrarRegistro() {
-    cout << "Registro del Estacionamiento:" << endl;
-    cout << "Espacios: " << espacios << endl;
-    cout << "Ocupados: " << ocupados << endl;
-    cout << "Libres: " << libres << endl;
-    cout << "Recaudados: " << recaudados << endl;
-    cout << "Porcentaje: " << porcentaje << endl;
+// Resto del código de la clase Estacionamiento...
+
+void Estacionamiento::inicializarEspacios() {
+    cout << "Ingrese la cantidad de espacios que tiene el estacionamiento: ";
+    cin >> espacios;
+    ingresos = espacios;
 }
 
-void Estacionamiento::ingresarespacios(ManejadorArchivosTexto reg,int esp) {
+void Estacionamiento::inicializarlibres() {
+    int acumulador=0;
+    cout << "Cuantos autos ingresaron: ";
+    cin >> ingresos;
+    acumulador=acumulador+ingresos;
+    ingresos=acumulador;
 
-    cout<<"Ingrese espacios totales:"<<endl;
-    cin>>esp;
-    reg.escribirArchivo(esp);
+    if(ingresos >espacios) {
+        cout << "no hay suficientes espacios" << endl;
+    }else {
+        espacios=espacios- ingresos;
+        cout<<"espacios guardados"<<endl;
+
+
+    }
+
+
+
+
+}
+
+void Estacionamiento::espaciosocupados() {
+
+    int acum=0;
+
+    cout << "Cuantos autos egresaron : "<<endl;
+    cin>>egresos;
+
+
+
+
+    if(egresos>espacios){
+        cout<<"No hay autos suficientes"<<endl;
+    }else{
+        acum=acum+egresos;
+        egresos=acum;
+        espacios=espacios+egresos;
+        cout<<"AUTOS EGRESADOS CORRRECTAMENTE"<<endl;
+    }
+
+}
+void Estacionamiento::salidaDeAutos() {
+    int precio=200;
+    int total;
+    total=egresos*precio;
+    cout<<"el total recaudado es : " << total << endl;
+    registro.escribirArchivo(total);
+
 
 }
 
 int main() {
+    int recaudados = 0;
     int espacios = 0;
     int ocupados = 0;
     int libres = 0;
-    float recaudados = 0;
     float porcentaje = 0;
+    ManejadorArchivosTexto registro(recaudados);
+
+    Estacionamiento estacionamiento(recaudados, espacios, ocupados, libres, porcentaje,registro);
+
     int op;
 
     do {
         cout << "-----MENU DE OPCIONES-----" << endl;
-        cout << "1)Ingrese cantidad de espacios en el estacionamiento" << endl;
-        cout << "2)Ingrese cantidad de espacios libres en el estacionamiento" << endl;
-        cout << "3)Ingrese cantidad de espacios ocupados en el estacionamiento" << endl;
-        cout << "4)Ingrese cantidad recaudada" << endl;
-        cout << "5)Ingrese porcentaje ocupado" << endl;
+        cout << "1) Cantidad de espacios en el estacionamiento" << endl;
+        cout << "2) Regsitrar ingreso del auto en el estacionamiento" << endl;
+        cout << "3) Regsitrar egreso del estacionamiento" << endl;
+        cout << "4) Cantidad recaudada" << endl;
+        cout << "5) Porcentaje ocupado" << endl;
+        cout << "6)salir"<<endl;
+        cout << "Ingrese una opcion: "<<endl;
         cin>>op;
-    } while(op!=0);
 
+        switch (op) {
+            case 1:
+                estacionamiento.inicializarEspacios();
+                break;
+            case 2:
+                estacionamiento.inicializarlibres();
+                break;
+            case 3:
+                estacionamiento.espaciosocupados();
+                break;
+            case 4:
+                estacionamiento.salidaDeAutos();
+                break;
+            case 5:
+                cout << "Ha seleccionado la Opción 5." << endl;
+                break;
+            case 6:
+                cout << "Saliendo del programa..." << endl;
+                return 0; // Sale del programa
+            default:
+                cout << "Opción inválida. Intente nuevamente." << endl;
+                break;
+        }
 
+        cout << endl;
 
-
-    ManejadorArchivosTexto manejador(espacios, libres, ocupados, recaudados, porcentaje);
-
-    //estas objeto usalo adentro de la clases estacionamiento
-    manejador.escribirArchivo("registro.txt", espacios, libres, ocupados, recaudados, porcentaje);
-
-    Estacionamiento estacionamiento(manejador, espacios, ocupados, libres, recaudados, porcentaje);
-    estacionamiento.mostrarRegistro();
-    manejador.leerArchivo("registro.txt");
+    } while (op != 6);
 
     return 0;
 }
